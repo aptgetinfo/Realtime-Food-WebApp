@@ -8,6 +8,8 @@ const expressLayouts= require('express-ejs-layouts')
 require('./app/db/mongoose')
 const session=require('express-session')
 const MongoStore=require('connect-mongo')(session)
+const passport= require('passport')
+
 
 
 
@@ -22,17 +24,22 @@ app.use(session({
     cookie:{maxAge:1000 * 60 * 60 * 24 }
 }))
 
+
+require('./app/config/passport')(passport)
+app.use(passport.initialize())
+app.use(passport.session())
+
+
 app.use(flash())
-
-
 
 
 app.use(express.urlencoded({extended:false}))
 app.use(express.json())
 
-
+//Global Middlewares
 app.use((req,res,next) => {
     res.locals.session =req.session
+    res.locals.user=req.user
     next()
 })
 
