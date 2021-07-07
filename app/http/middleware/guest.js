@@ -5,7 +5,7 @@ module.exports={
             return next();
         }
         else{
-            res.redirect('/')
+            res.redirect('/login')
         }
     },
     ensureGuest:(req,res,next)=>{
@@ -14,6 +14,13 @@ module.exports={
         }
         else{
             return next();
+        }
+    }, admin:(req,res,next)=>{
+        if(req.isAuthenticated() && req.user.role==='admin'){
+            return next();
+        }
+        else{
+            res.redirect('/')
         }
     }
 }

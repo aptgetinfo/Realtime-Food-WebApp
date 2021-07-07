@@ -2,12 +2,20 @@ const User =require('../../models/user')
 const bcrypt = require('bcrypt')
 const passport=require('passport')
 
-
+const _getRedirectUrl=(req)=>{
+    return req.user.role==='admin'?'/admin/orders':'/customer/orders'
+}
 module.exports={
+    
     login:async (req,res)=>{
         res.render('auth/login')
     },
     postLogin:async (req,res,next)=>{
+        const {name,email,password} = req.body
+        if(!email || !password){
+            req.flash('error','All fields are required')
+            return res.redirect('/login');
+        }
         passport.authenticate('local',(err,user,info)=>{
             if(err){
                 req.flash('error',info.message)
@@ -22,7 +30,7 @@ module.exports={
                     req.flash('error',info.message)
                 return next(err)
                 }
-                res.redirect('/')
+                res.redirect(_getRedirectUrl(req))
             })
         })(req,res,next)
     },
