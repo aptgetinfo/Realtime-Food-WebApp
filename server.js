@@ -1,4 +1,5 @@
 const express= require('express')
+const socketio=require('socket.io')
 const path = require('path')
 const flash = require('express-flash')
 const mongoose=require('mongoose')
@@ -9,11 +10,17 @@ require('./app/db/mongoose')
 const session=require('express-session')
 const MongoStore=require('connect-mongo')(session)
 const passport= require('passport')
+const Emitter = require('events')
 
 
 
 
 const app = express()
+
+
+
+const eventEmitter = new Emitter()
+app.set('eventEmitter',eventEmitter)
 
 
 app.use(session({
@@ -56,6 +63,22 @@ app.use(web)
 
 
 const PORT = process.env.PORT || 3000
-app.listen(PORT,()=>{
+const server=app.listen(PORT,()=>{
     console.log(`Listening on port ${PORT}`)
+})
+
+const io = require('socket.io')(server)
+io.on('connection', (socket) => {
+      // Join
+      socket.on('join', (orderId) => {
+        socket.join(orderId)
+      })
+})
+
+eventEmitter.on('orderUpdated', (data) => {
+    io.to(`order_${data.id}`).emit('orderUpdated', data)
+})
+
+eventEmitter.on('orderPlaced', (data) => {
+    io.to('adminRoom').emit('orderPlaced', data)
 })
