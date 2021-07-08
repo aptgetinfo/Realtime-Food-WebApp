@@ -27,5 +27,14 @@ module.exports={
             {sort:{'createdAt':-1}})
         res.header('Cache-Control', 'no-cache,private,no-store,must-revalidate,max-stale=0,post-check=0,pre-check=0')
         res.render('customers/orders',{orders:orders,moment:moment})
+    },
+    show:async (req,res)=>{
+        const orderr =await Order.findById(req.params.id)
+        if(req.user._id.toString()===orderr.customerId.toString()){
+            res.render('customers/singleOder',{order:orderr})
+        }
+        else{
+            return res.redirect('/')
+        }
     }
 }

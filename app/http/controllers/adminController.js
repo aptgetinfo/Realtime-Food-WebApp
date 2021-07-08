@@ -9,4 +9,13 @@ module.exports={
             }
         })
     },
+    status:async (req,res)=>{
+        try {
+            await order.updateOne({_id:req.body.orderId},{status: req.body.status})
+            return res.render('admin/orders')
+        } catch (error) {
+            console.log(error)
+            return res.render('admin/orders')
+        }
+    }
 }
